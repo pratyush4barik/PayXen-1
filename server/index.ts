@@ -9,8 +9,6 @@ import { seed } from "./seed";
 const app = express();
 const httpServer = createServer(app);
 
-registerRoutes(app);
-
 declare module "http" {
   interface IncomingMessage {
     rawBody: unknown;
@@ -64,8 +62,27 @@ app.use((req, res, next) => {
   next();
 });
 
-const PORT = Number(process.env.PORT) || 5000;
-httpServer.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+registerRoutes(httpServer, app);
+serveStatic(app);
+
+(async () => {
+  try {
+    if (process.env.NODE_ENV === "production") {
+      await runMigrations();
+      await seed();
+      console.log("✅ DB ready");
+    }
+  } catch (err) {
+    console.error("❌ DB setup failed", err);
+    process.exit(1);
+  }
+
+  const PORT = Number(process.env.PORT) || 5000;
+  httpServer.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+})().catch((err) => {
+  console.error("Fatal error:", err);
+  process.exit(1);
 });
 
