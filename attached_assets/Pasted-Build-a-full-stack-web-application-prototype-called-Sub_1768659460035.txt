@@ -1,0 +1,155 @@
+Build a full-stack web application prototype called "SubX" (Smart Subscription Wallet & Manager).
+
+TECH STACK:
+- Frontend: React.js + Tailwind CSS
+- Backend: Node.js + Express.js
+- Database: PostgreSQL (use Prisma ORM)
+- Charts: Chart.js or Recharts
+- Auth: Simple email + password auth (JWT-based)
+- No real banking or UPI integration (use mock wallet system only)
+
+IMPORTANT:
+This is ONLY a PROTOTYPE. Use FAKE subscription data and a DATABASE wallet (no real payments).
+
+--------------------------------
+CORE CONCEPT:
+--------------------------------
+Users deposit money into a virtual wallet stored in the database.
+All subscriptions are assumed to be paid from the platform’s enterprise bank account (mocked).
+The system can automatically cancel subscriptions using a "Ghost Cancel Agent" based on rules.
+
+--------------------------------
+FEATURES TO IMPLEMENT:
+--------------------------------
+
+1. LANDING WEBSITE (Public Pages)
+Create these pages with clean UI:
+- Home (Hero section + Get Started button)
+- What We Provide (features explanation)
+- Pricing (fake plans)
+- About Us
+- Login / Signup
+
+--------------------------------
+2. AUTHENTICATION
+--------------------------------
+- User Signup & Login
+- JWT-based authentication
+- After login → redirect to Dashboard
+
+--------------------------------
+3. DASHBOARD (After Login)
+--------------------------------
+Dashboard should show:
+- Total Wallet Balance
+- Total Monthly Expenses
+- Active Subscriptions Count
+- Cancelled Subscriptions Count
+- Line / Bar graph of expenses per month
+- Pie chart of category-wise spending
+
+--------------------------------
+4. WALLET SYSTEM (MOCK)
+--------------------------------
+- Wallet table in DB
+- User can:
+  - Add money to wallet (fake top-up)
+  - See wallet balance
+  - View wallet transaction history
+- Wallet balance is reduced when subscriptions are active
+- Refund money to wallet when subscription is cancelled
+-withdraw to bank
+
+--------------------------------
+5. SUBSCRIPTIONS MODULE
+--------------------------------
+Use FAKE subscription data like:
+- Netflix (₹499/month)
+- Spotify (₹119/month)
+- Adobe (₹1675/month)
+- Amazon Prime (₹1499/year)
+
+Each subscription should have:
+- name
+- price
+- billing_cycle (monthly/yearly)
+- start_date
+- free_trial_end_date
+- last_used_date
+- usage_count (times used in a month)
+- status (active / cancelled)
+- auto_cancel_enabled (true/false)
+
+--------------------------------
+6. GHOST CANCEL AGENT (AUTOMATIC LOGIC)
+--------------------------------
+Implement automatic cancellation rules:
+- Cancel if free_trial_end_date == today
+- Cancel if usage_count <= 1 in last 30 days
+- Cancel if last_used_date > 30 days ago
+- Cancel if wallet balance is insufficient
+
+When cancelled:
+- Mark subscription as cancelled
+- Refund unused amount back to wallet
+- Log cancellation reason
+
+--------------------------------
+7. GROUP SUBSCRIPTION & SPLIT ENGINE
+--------------------------------
+Users can create a Group:
+- Group name
+- Members
+- Initial split percentage (total = 100%)
+
+Logic:
+- Track usage per member
+- At end of month:
+  - Higher usage → pays more
+  - Lower usage → pays less
+  - Extra amount is credited to low-usage users' wallet
+- Show group expense breakdown
+
+--------------------------------
+8. PAGES AFTER LOGIN
+--------------------------------
+Create these pages:
+- Dashboard
+- Wallet
+- Subscriptions
+- Groups
+- Expenses
+- Profile
+
+--------------------------------
+9. DATABASE MODELS (Prisma)
+--------------------------------
+Create models for:
+- User
+- Wallet
+- WalletTransaction
+- Subscription
+- Group
+- GroupMember
+- UsageLog
+- CancellationLog
+
+--------------------------------
+10. UI & UX
+--------------------------------
+- Modern SaaS dashboard look
+- Sidebar navigation
+- Mobile responsive
+- Use dummy data where required
+
+--------------------------------
+DELIVERABLE:
+--------------------------------
+- Complete runnable code
+- Clear folder structure
+- Prisma schema
+- Seed script for fake subscription data
+- README with setup instructions
+
+Do NOT integrate real payment APIs.
+This is a demo/prototype only.
