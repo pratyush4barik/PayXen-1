@@ -80,3 +80,10 @@ app.use((req, res, next) => {
     console.log(`🚀 Server running on port ${PORT}`);
   });
 })();
+registerRoutes(app);
+serveStatic(app);
+
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  console.error("❌ Unhandled error:", err);
+  res.status(500).json({ error: "Internal Server Error" });
+});
