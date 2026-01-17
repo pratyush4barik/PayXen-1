@@ -133,11 +133,34 @@ export async function registerRoutes(
     res.json({ processed, cancelled, logs });
   });
 
-  // === Groups ===
-  app.get(api.groups.list.path, async (req, res) => {
+  app.post(api.groups.create.path, async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    const groups = await storage.getGroups(req.user.id);
-    res.json(groups);
+    
+    try {
+      const { name, members } = api.groups.create.input.parse(req.body);
+      
+      // Find user IDs for the provided usernames
+      const memberIds: number[] = [];
+      for (const username of members) {
+        const user = await storage.getUserByUsername(username);
+        if (user) {
+          memberIds.push(user.id);
+        }
+      }
+      
+      const group = await storage.createGroup({
+        name,
+        creatorId: req.user.id,
+        totalExpense: "0"
+      }, memberIds);
+      
+      res.status(201).json(group);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      res.status(500).json({ message: "Failed to create group" });
+    }
   });
 
   return httpServer;
