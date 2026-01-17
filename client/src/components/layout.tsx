@@ -33,9 +33,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="p-6 border-b border-border/40">
           <Link href="/dashboard" className="flex items-center gap-2 group cursor-pointer">
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/40 transition-all duration-300">
-              <Ghost className="w-5 h-5 text-white" />
+              <span className="text-white font-black text-xl">P</span>
             </div>
-            <span className="text-xl font-bold font-display tracking-tight text-white group-hover:text-primary transition-colors">SubX</span>
+            <span className="text-xl font-bold font-display tracking-tight text-white group-hover:text-primary transition-colors">PAYXEN</span>
           </Link>
         </div>
 

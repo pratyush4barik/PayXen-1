@@ -50,3 +50,31 @@ export function useDeposit() {
     },
   });
 }
+
+export function useWithdraw() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (amount: number) => {
+      const res = await fetch(api.wallet.withdraw.path, {
+        method: api.wallet.withdraw.method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount }),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Withdrawal failed");
+      }
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.wallet.get.path] });
+      queryClient.invalidateQueries({ queryKey: [api.wallet.transactions.path] });
+      toast({ title: "Withdrawal Successful", description: "Funds removed from your wallet." });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Withdrawal Failed", description: error.message, variant: "destructive" });
+    },
+  });
+}
