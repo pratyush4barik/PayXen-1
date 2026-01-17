@@ -138,11 +138,13 @@ export const api = {
     create: {
       method: 'POST' as const,
       path: '/api/groups',
-      input: insertGroupSchema.extend({
-        members: z.array(z.string()), // usernames to add
+      input: z.object({
+        name: z.string().min(1, "Group name is required"),
+        members: z.array(z.string()).default([]),
       }),
       responses: {
         201: z.custom<typeof groups.$inferSelect>(),
+        400: errorSchemas.validation,
       },
     },
   }

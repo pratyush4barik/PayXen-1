@@ -97,8 +97,14 @@ export const insertUserSchema = createInsertSchema(users).omit({ id: true, creat
 export const insertWalletSchema = createInsertSchema(wallets).omit({ id: true });
 export const insertTransactionSchema = createInsertSchema(transactions).omit({ id: true, createdAt: true });
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({ id: true });
-export const insertGroupSchema = createInsertSchema(groups).omit({ id: true });
+export const insertGroupSchema = createInsertSchema(groups).omit({ id: true, totalExpense: true });
 export const insertGroupMemberSchema = createInsertSchema(groupMembers).omit({ id: true, joinedAt: true });
+
+// Request types - be explicit about what each mutation accepts
+export type CreateGroupRequest = {
+  name: string;
+  members: string[]; // usernames
+};
 
 // Types
 export type User = typeof users.$inferSelect;
