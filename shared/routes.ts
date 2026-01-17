@@ -74,6 +74,15 @@ export const api = {
         200: z.custom<typeof wallets.$inferSelect>(),
       },
     },
+    withdraw: {
+      method: 'POST' as const,
+      path: '/api/wallet/withdraw',
+      input: z.object({ amount: z.coerce.number().positive() }),
+      responses: {
+        200: z.custom<typeof wallets.$inferSelect>(),
+        400: z.object({ message: z.string() }),
+      },
+    },
     transactions: {
       method: 'GET' as const,
       path: '/api/wallet/transactions',

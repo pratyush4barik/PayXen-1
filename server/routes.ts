@@ -38,6 +38,26 @@ export async function registerRoutes(
     res.json(wallet);
   });
 
+  app.post(api.wallet.withdraw.path, async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    const { amount } = api.wallet.withdraw.input.parse(req.body);
+    
+    const wallet = await storage.getWallet(req.user.id);
+    if (!wallet || parseFloat(wallet.balance) < amount) {
+      return res.status(400).json({ message: "Insufficient balance" });
+    }
+
+    const updatedWallet = await storage.updateWalletBalance(req.user.id, -amount);
+    await storage.createTransaction({
+      walletId: updatedWallet.id,
+      amount: amount.toString(),
+      type: "withdrawal",
+      description: "Wallet Withdrawal"
+    });
+    
+    res.json(updatedWallet);
+  });
+
   app.get(api.wallet.transactions.path, async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const wallet = await storage.getWallet(req.user.id);
