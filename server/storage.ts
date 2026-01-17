@@ -121,26 +121,40 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  async createGroup(groupData: any, memberIds: number[]): Promise<Group> {
+  async createGroup(groupData: any, members: { userId: number, splitPercentage: number }[]): Promise<Group> {
     const [group] = await db.insert(groups).values(groupData).returning();
     
-    // Add creator
+    // Add creator with their split
+    // Find creator split from members or default
+    const creatorMember = members.find(m => m.userId === group.creatorId);
+    const creatorSplit = creatorMember ? creatorMember.splitPercentage : 100;
+
     await db.insert(groupMembers).values({
       groupId: group.id,
       userId: group.creatorId,
-      splitPercentage: (100 / (memberIds.length + 1)).toString()
+      splitPercentage: creatorSplit.toString()
     });
 
     // Add other members
-    for (const uid of memberIds) {
+    for (const m of members) {
+      if (m.userId === group.creatorId) continue;
       await db.insert(groupMembers).values({
         groupId: group.id,
-        userId: uid,
-        splitPercentage: (100 / (memberIds.length + 1)).toString()
+        userId: m.userId,
+        splitPercentage: m.splitPercentage.toString()
       });
     }
     
     return group;
+  }
+
+  async removeGroupMember(groupId: number, userId: number): Promise<void> {
+    await db.delete(groupMembers).where(
+      and(
+        eq(groupMembers.groupId, groupId),
+        eq(groupMembers.userId, userId)
+      )
+    );
   }
 }
 

@@ -140,11 +140,22 @@ export const api = {
       path: '/api/groups',
       input: z.object({
         name: z.string().min(1, "Group name is required"),
-        members: z.array(z.string()).default([]),
+        members: z.array(z.object({
+          username: z.string(),
+          splitPercentage: z.coerce.number().min(0).max(100)
+        })).default([]),
       }),
       responses: {
         201: z.custom<typeof groups.$inferSelect>(),
         400: errorSchemas.validation,
+      },
+    },
+    deleteMember: {
+      method: 'DELETE' as const,
+      path: '/api/groups/:groupId/members/:userId',
+      responses: {
+        200: z.void(),
+        404: errorSchemas.notFound,
       },
     },
   }

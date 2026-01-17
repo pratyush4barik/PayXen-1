@@ -139,20 +139,33 @@ export async function registerRoutes(
     try {
       const { name, members } = api.groups.create.input.parse(req.body);
       
-      // Find user IDs for the provided usernames
-      const memberIds: number[] = [];
-      for (const username of members) {
-        const user = await storage.getUserByUsername(username);
+      const memberDetails: { userId: number, splitPercentage: number }[] = [];
+      let totalSplit = 0;
+
+      for (const m of members) {
+        const user = await storage.getUserByUsername(m.username);
         if (user) {
-          memberIds.push(user.id);
+          memberDetails.push({ userId: user.id, splitPercentage: m.splitPercentage });
+          totalSplit += m.splitPercentage;
         }
+      }
+
+      // Check if creator is in the list, if not add them
+      const creatorInList = memberDetails.find(m => m.userId === req.user.id);
+      if (!creatorInList) {
+        // This shouldn't happen with proper frontend logic, but safe-guard
+        return res.status(400).json({ message: "Creator must be part of the split" });
+      }
+
+      if (Math.abs(totalSplit - 100) > 0.01) {
+        return res.status(400).json({ message: "Total split must equal 100%" });
       }
       
       const group = await storage.createGroup({
         name,
         creatorId: req.user.id,
         totalExpense: "0"
-      }, memberIds);
+      }, memberDetails);
       
       res.status(201).json(group);
     } catch (err) {
@@ -161,6 +174,15 @@ export async function registerRoutes(
       }
       res.status(500).json({ message: "Failed to create group" });
     }
+  });
+
+  app.delete(api.groups.deleteMember.path, async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    const groupId = parseInt(req.params.groupId);
+    const userId = parseInt(req.params.userId);
+    
+    await storage.removeGroupMember(groupId, userId);
+    res.sendStatus(200);
   });
 
   return httpServer;
