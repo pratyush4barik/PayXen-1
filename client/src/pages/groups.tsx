@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Layout } from "@/components/layout";
 import { useGroups, useCreateGroup, useDeleteMember } from "@/hooks/use-groups";
-import { useUser } from "@/hooks/use-user";
+import { useAuth } from "@/hooks/use-auth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { Users, Plus, Loader2, X, AlertCircle } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Groups() {
-  const { user: currentUser } = useUser();
+  const { user: currentUser } = useAuth();
   const { data: groups, isLoading } = useGroups();
   const createGroup = useCreateGroup();
   const deleteMember = useDeleteMember();
