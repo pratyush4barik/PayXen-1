@@ -56,9 +56,13 @@ export async function registerRoutes(
   app.post(api.subscriptions.create.path, async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     
-    // Force numbers for decimal fields if they come as strings
+    // Force numbers/dates for fields if they come as strings
     const body = { ...req.body, userId: req.user.id };
+    
     if (typeof body.price === 'string') body.price = parseFloat(body.price);
+    if (typeof body.startDate === 'string') body.startDate = new Date(body.startDate);
+    if (typeof body.nextBillingDate === 'string') body.nextBillingDate = new Date(body.nextBillingDate);
+    if (typeof body.lastUsedDate === 'string') body.lastUsedDate = new Date(body.lastUsedDate);
     
     const sub = await storage.createSubscription(body);
     res.status(201).json(sub);
