@@ -64,21 +64,8 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
-  try {
-    if (process.env.NODE_ENV === "production") {
-      await runMigrations(); // ✅ creates tables
-      await seed();          // ✅ inserts demo data
-      console.log("✅ DB ready");
-    }
-  } catch (err) {
-    console.error("❌ DB setup failed", err);
-    process.exit(1);
-  }
-
-  const PORT = Number(process.env.PORT) || 5000;
-  httpServer.listen(PORT, "0.0.0.0", () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-  });
-})();
+const PORT = Number(process.env.PORT) || 5000;
+httpServer.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
 

@@ -1,20 +1,19 @@
-import "dotenv/config";
-import { exec } from "child_process";
+import { db } from "./db";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
+import path from "path";
 
 export async function runMigrations() {
-  return new Promise<void>((resolve, reject) => {
-    console.log("🗄️ Running database migrations...");
-
-    exec("npx drizzle-kit push", (error, stdout, stderr) => {
-      if (error) {
-        console.error("❌ Migration failed");
-        console.error(stderr);
-        return reject(error);
-      }
-
-      console.log(stdout);
-      console.log("✅ Migrations completed");
-      resolve();
-    });
-  });
+  try {
+    console.log("🔄 Running migrations...");
+    await migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
+    console.log("✅ Migrations complete");
+  } catch (err: any) {
+    // If tables already exist, that's okay - just log it
+    if (err.code === '42P07' || err.message?.includes('already exists')) {
+      console.log("✅ Database tables already exist, skipping migration");
+      return;
+    }
+    console.error("❌ Migration failed:", err);
+    throw err;
+  }
 }
