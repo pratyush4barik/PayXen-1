@@ -33,7 +33,7 @@ export function setupAuth(app: Express) {
     saveUninitialized: false,
     store: new PgStore({
       pool,
-      createTableIfMissing: true,
+      createTableIfMissing: false,
     }),
     cookie: {
       secure: app.get("env") === "production",
